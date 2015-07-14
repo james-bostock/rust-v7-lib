@@ -1,0 +1,8 @@
+[package]
+name = "rust-v6-cmd"
+version = "0.1.0"
+authors = ["James Bostock <james.bostock@gmail.com>"]
+description = "Some Sixth Edition Unix commands implemented in Rust"
+repository = "https://github.com/james-bostock/rust-v6-cmd"
+readme = "README.md"
+license = "MIT"
