@@ -3,4 +3,5 @@ Some Sixth Edition Unix commands implemented in Rust.
 
 Commands implemented:
 
+* cat
 * echo
