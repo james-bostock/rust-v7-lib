@@ -6,6 +6,7 @@
 use std::env;
 use std::fs::File;
 use std::io;
+use std::io::Write;
 use std::path::Path;
 
 fn cat(filename: &str) -> io::Result<u64> {
@@ -29,7 +30,8 @@ fn main() {
         match cat(&arg) {
             Ok(_) => {},
             Err(e) => {
-                println!("{}: {}", arg, e);
+                let mut stderr = std::io::stderr();
+                writeln!(&mut stderr, "{}: {}", arg, e).unwrap();
             }
         };
     }
