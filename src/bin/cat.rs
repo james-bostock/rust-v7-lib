@@ -9,6 +9,10 @@ use std::io;
 use std::io::Write;
 use std::path::Path;
 
+#[path = "../lib/util.rs"]
+#[macro_use]
+mod util;
+
 fn cat(filename: &str) -> io::Result<u64> {
     let mut reader = if filename == "-" {
         Box::new(io::stdin()) as Box<io::Read>
@@ -30,8 +34,7 @@ fn main() {
         match cat(&arg) {
             Ok(_) => {},
             Err(e) => {
-                let mut stderr = std::io::stderr();
-                writeln!(&mut stderr, "{}: {}", arg, e).unwrap();
+                errln!("{}: {}", arg, e);
             }
         };
     }
