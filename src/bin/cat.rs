@@ -20,11 +20,11 @@ fn cat(filename: &str) -> io::Result<u64> {
         Box::new(try!(File::open(Path::new(&filename)))) as Box<io::Read>
     };
 
-    io::copy(& mut reader, & mut io::stdout())
+    io::copy(&mut reader, &mut io::stdout())
 }
 
 fn main() {
-    let mut args : Vec<_> = env::args().collect();
+    let mut args: Vec<_> = env::args().collect();
 
     if args.len() == 1 {
         args.push("-".to_string());
@@ -32,7 +32,7 @@ fn main() {
 
     for arg in args.iter().skip(1) {
         match cat(&arg) {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(e) => {
                 errln!("{}: {}", arg, e);
             }

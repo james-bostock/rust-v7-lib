@@ -3,7 +3,8 @@
 
 // Utility routines
 
-// Taken from stackoverflow: http://stackoverflow.com/questions/27588416/how-to-send-output-to-stderr
+// Taken from stackoverflow:
+// http://stackoverflow.com/questions/27588416/how-to-send-output-to-stderr
 macro_rules! errln(
     ($($arg:tt)*) => (
         match writeln!(&mut ::std::io::stderr(), $($arg)* ) {

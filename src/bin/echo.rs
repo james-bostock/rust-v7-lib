@@ -5,7 +5,7 @@
 // See http://man.cat-v.org/unix-6th/1/echo
 
 fn main() {
-  for arg in std::env::args().skip(1) {
-    println!("{}", arg);
-  }
+    for arg in std::env::args().skip(1) {
+        println!("{}", arg);
+    }
 }
