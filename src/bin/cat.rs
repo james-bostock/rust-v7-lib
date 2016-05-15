@@ -1,25 +1,18 @@
-// Copyright 2015 James Bostock. See the LICENSE file at the top-level
+// Copyright 2015, 2016 James Bostock. See the LICENSE file at the top-level
 // directory of this distribution.
 
 // An implementation of the cat(1) command in Rust.
 // See http://man.cat-v.org/unix-6th/1/cat
 use std::env;
-use std::fs::File;
 use std::io;
 use std::io::Write;
-use std::path::Path;
 
 #[path = "../lib/util.rs"]
 #[macro_use]
 mod util;
 
 fn cat(filename: &str) -> io::Result<u64> {
-    let mut reader = if filename == "-" {
-        Box::new(io::stdin()) as Box<io::Read>
-    } else {
-        Box::new(try!(File::open(Path::new(&filename)))) as Box<io::Read>
-    };
-
+    let mut reader = try!(util::open_file(&filename));
     io::copy(&mut reader, &mut io::stdout())
 }
 
