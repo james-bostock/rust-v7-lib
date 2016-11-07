@@ -12,7 +12,7 @@ use std::io::Write;
 mod util;
 
 fn cat(filename: &str) -> io::Result<u64> {
-    let mut reader = try!(util::open_file(&filename));
+    let mut reader = try!(util::Input::open(&filename));
     io::copy(&mut reader, &mut io::stdout())
 }
 
