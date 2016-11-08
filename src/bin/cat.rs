@@ -7,7 +7,6 @@ use std::env;
 use std::io;
 use std::io::Write;
 
-#[path = "../lib/util.rs"]
 #[macro_use]
 mod util;
 
