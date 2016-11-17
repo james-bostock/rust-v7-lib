@@ -11,7 +11,7 @@ use std::io::Write;
 mod util;
 
 fn cat(filename: &str) -> io::Result<u64> {
-    let mut reader = try!(util::Input::open(&filename));
+    let mut reader = util::Input::open(&filename)?;
     io::copy(&mut reader, &mut io::stdout())
 }
 

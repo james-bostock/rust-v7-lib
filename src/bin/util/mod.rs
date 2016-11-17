@@ -71,7 +71,7 @@ impl Input {
         if filename == "-" {
             Ok(Input::Stdin(io::stdin()))
         } else {
-            Ok(Input::File(try!(fs::File::open(filename))))
+            Ok(Input::File(fs::File::open(filename)?))
         }
     }
 }
