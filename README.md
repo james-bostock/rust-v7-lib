@@ -5,3 +5,4 @@ Commands implemented:
 
 * cat
 * echo
+* rm
