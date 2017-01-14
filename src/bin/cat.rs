@@ -5,7 +5,6 @@
 // See http://man.cat-v.org/unix-6th/1/cat
 use std::env;
 use std::io;
-use std::io::Write;
 
 #[macro_use]
 mod util;

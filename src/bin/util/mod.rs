@@ -11,6 +11,7 @@ use std::fs::File;
 // http://stackoverflow.com/questions/27588416/how-to-send-output-to-stderr
 macro_rules! errln(
     ($($arg:tt)*) => (
+        use std::io::Write;
         match writeln!(&mut ::std::io::stderr(), $($arg)* ) {
             Ok(_) => {},
             Err(x) => panic!("Unable to write to stderr: {}", x),
