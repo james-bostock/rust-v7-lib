@@ -1,4 +1,4 @@
-// Copyright 2015, 2016 James Bostock. See the LICENSE file at the top-level
+// Copyright 2015-2017 James Bostock. See the LICENSE file at the top-level
 // directory of this distribution.
 
 use std::fs;
