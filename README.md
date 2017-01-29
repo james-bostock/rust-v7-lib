@@ -5,4 +5,5 @@ Commands implemented:
 
 * cat
 * echo
+* od
 * rm
