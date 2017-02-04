@@ -24,8 +24,7 @@ macro_rules! errln(
 // We use an enum so that, when the input is from a file, we can seek on
 // it (as needed by the od command).
 //
-// Taken from stackoverflow:
-// http://stackoverflow.com/questions/37223741/how-can-i-take-input-from-either-stdin-or-a-file-if-i-cannot-seek-stdin
+// Taken from stackoverflow: http://bit.ly/2kbtASY
 
 /// The `Input` type.
 pub enum Input {
