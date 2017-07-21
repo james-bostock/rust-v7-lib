@@ -51,14 +51,14 @@ fn main() {
                                 }
                             },
                             Err(e) => {
-                                errln!("Error reading response: {}", e);
+                                eprintln!("Error reading response: {}", e);
                                 break;
                             }
                         }
                     }
                 },
                 Err(e) => {
-                    errln!("{}; {}", arg, e);
+                    eprintln!("{}; {}", arg, e);
                     continue;
                 }
             }
@@ -69,10 +69,10 @@ fn main() {
                 fs::remove_file(arg)
             } {
                 Ok(_) => {},
-                Err(e) => { if !force { errln!("{}: {}", arg, e); } }
+                Err(e) => { if !force { eprintln!("{}: {}", arg, e); } }
             }
         }
     } else {
-        errln!("usage: {} [-f][-r] file ...", args[0]);
+        eprintln!("usage: {} [-f][-r] file ...", args[0]);
     }
 }

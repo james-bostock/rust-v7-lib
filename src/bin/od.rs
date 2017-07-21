@@ -222,7 +222,7 @@ fn main() {
     match od(&filename, offset, &fmts) {
         Ok(_) => std::process::exit(0),
         Err(e) => {
-            errln!("Error: {}", e);
+            eprintln!("Error: {}", e);
             std::process::exit(1)
         }
     }

@@ -7,18 +7,6 @@ use std::fs::File;
 
 // Utility routines
 
-// Taken from stackoverflow:
-// http://stackoverflow.com/questions/27588416/how-to-send-output-to-stderr
-macro_rules! errln(
-    ($($arg:tt)*) => (
-        use std::io::Write;
-        match writeln!(&mut ::std::io::stderr(), $($arg)* ) {
-            Ok(_) => {},
-            Err(x) => panic!("Unable to write to stderr: {}", x),
-        }
-    )
-);
-
 // An input source.
 //
 // We use an enum so that, when the input is from a file, we can seek on

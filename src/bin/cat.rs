@@ -25,7 +25,7 @@ fn main() {
         match cat(&arg) {
             Ok(_) => {}
             Err(e) => {
-                errln!("{}: {}", arg, e);
+                eprintln!("{}: {}", arg, e);
             }
         };
     }
