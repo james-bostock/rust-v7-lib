@@ -1,5 +1,5 @@
-// Copyright 2016 James Bostock. See the LICENSE file at the top-level
-// directory of this distribution.
+// Copyright 2016, 2017 James Bostock. See the LICENSE file at the
+// top-level directory of this distribution.
 
 // An implementation of the rm(1) command in Rust.
 // See http://man.cat-v.org/unix-6th/1/rm
