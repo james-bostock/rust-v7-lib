@@ -11,6 +11,51 @@ use std::io::Write;
 #[macro_use]
 mod util;
 
+/// Prompts user for confirmation
+fn confirm(msg: &str) -> io::Result<bool> {
+    print!("{}: ", msg);
+    io::stdout().flush()?;
+    let mut resp = String::new();
+    io::stdin().read_line(&mut resp)?;
+    match resp.chars().next() {
+        Some(c) => {
+            if c == 'y' {
+                Ok(true)
+            } else {
+                Ok(false)
+            }
+        },
+        None => Ok(false)
+    }
+}
+
+/// Removes a file or directory
+fn rm(name: &str, force: bool, recursive: bool) -> io::Result<()> {
+    let md = fs::metadata(name)?;
+    let go = if md.permissions().readonly() {
+        let mut msg = "rm: remove readonly file ".to_string();
+        msg.push_str(&name);
+        msg.push_str("?");
+        if confirm(&msg)? {
+            true
+        } else {
+            false
+        }
+    } else {
+        true
+    };
+
+    if go {
+        if recursive {
+            fs::remove_dir_all(name)
+        } else {
+            fs::remove_file(name)
+        }
+    } else {
+        Ok(())
+    }
+}
+
 fn main() {
     let args: Vec<_> = env::args().collect();
     let mut processing_options: bool = true;
@@ -33,43 +78,9 @@ fn main() {
                 processing_options = false;
             }
 
-            match fs::metadata(arg) {
-                Ok(md) => {
-                    if md.permissions().readonly() {
-                        print!("rm: remove readonly file {}? ", arg);
-                        io::stdout().flush();
-                        let mut resp = String::new();
-                        match io::stdin().read_line(&mut resp) {
-                            Ok(_) => {
-                                match resp.chars().next() {
-                                    Some(c) => {
-                                        if c != 'y' {
-                                            continue;
-                                        }
-                                    },
-                                    None => {}
-                                }
-                            },
-                            Err(e) => {
-                                eprintln!("Error reading response: {}", e);
-                                break;
-                            }
-                        }
-                    }
-                },
-                Err(e) => {
-                    eprintln!("{}; {}", arg, e);
-                    continue;
-                }
-            }
-
-            match if recursive {
-                fs::remove_dir_all(arg)
-            } else {
-                fs::remove_file(arg)
-            } {
+            match rm(arg, force, recursive) {
                 Ok(_) => {},
-                Err(e) => { if !force { eprintln!("{}: {}", arg, e); } }
+                Err(e) => eprintln!("{}: {}", arg, e)
             }
         }
     } else {
