@@ -3,7 +3,6 @@
 
 use std::fs;
 use std::io::{self, Read, Seek, SeekFrom};
-use std::fs::File;
 
 // Utility routines
 

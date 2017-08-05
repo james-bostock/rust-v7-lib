@@ -156,10 +156,10 @@ fn od(filename: &str, offset: u64,
             let mut first = true;
             for fmt in fmts.iter() {
                 if first {
-                    write!(writer, "{:07o}", offset);
+                    write!(writer, "{:07o}", offset)?;
                     first = false;
                 } else {
-                    write!(writer, "       ");
+                    write!(writer, "       ")?;
                 }
                 fmt(&mut writer, &chunk)?;
                 offset = offset + chunk.len() as u64;
@@ -170,7 +170,7 @@ fn od(filename: &str, offset: u64,
             break
         }
     }
-    writeln!(writer, "{:07o}", offset);
+    writeln!(writer, "{:07o}", offset)?;
     Ok(offset)
 }
 
