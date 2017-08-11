@@ -7,3 +7,4 @@ Commands implemented:
 * echo
 * od
 * rm
+* tee
