@@ -36,8 +36,10 @@ impl Write for Tee {
 fn main() {
     let args: Vec<_> = env::args().collect();
 
+    let prog = &args[0];
+
     if args.len() == 1 {
-        eprintln!("usage: {} [name ...]", args[0]);
+        eprintln!("usage: {} [name ...]", prog);
     }
 
     let mut tee: Tee = Tee { writers: Vec::new() };
@@ -47,7 +49,7 @@ fn main() {
     for arg in args.iter().skip(1) {
         match File::create(&arg) {
             Ok(f) => { tee.writers.push(Box::new(f)); },
-            Err(e) => { eprintln!("{}: {}", arg, e); }
+            Err(e) => { eprintln!("{}: {}: {}", prog, arg, e); }
         }
     }
 
