@@ -53,8 +53,5 @@ fn main() {
         }
     }
 
-    match io::copy(&mut io::stdin(), &mut tee) {
-        Ok(_) => {},
-        Err(e) => {eprintln!("Error: {}", e);}
-    }
+    io::copy(&mut io::stdin(), &mut tee).expect(prog);
 }
