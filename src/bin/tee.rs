@@ -19,7 +19,7 @@ impl Write for Tee {
     fn write(&mut self, buf: &[u8]) -> Result<usize> {
         let mut n: usize = 0;
         for w in &mut self.writers {
-            n = (*w).write(buf)?
+            n = w.write(buf)?
         }
         Ok(n)
     }
@@ -27,7 +27,7 @@ impl Write for Tee {
     /// Flushes each writer.
     fn flush(&mut self) -> Result<()> {
         for w in &mut self.writers {
-            (*w).flush()?
+            w.flush()?
         }
         Ok(())
     }
