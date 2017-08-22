@@ -13,6 +13,18 @@ struct Tee {
     writers: Vec<Box<Write>>
 }
 
+impl Tee {
+    // Create a new Tee
+    fn new() -> Self {
+        Tee { writers: Vec::new() }
+    }
+
+    // Add a writer to a Tee
+    fn push(&mut self, w: Box<Write>) {
+        self.writers.push(w);
+    }
+}
+
 impl Write for Tee {
     /// Writes a buffer to each of the writers, returning how many
     /// bytes were returned by the last write.
@@ -42,9 +54,9 @@ fn main() {
         eprintln!("usage: {} [name ...]", prog);
     }
 
-    let mut tee: Tee = Tee { writers: Vec::new() };
+    let mut tee: Tee = Tee::new();
 
-    tee.writers.push(Box::new(io::stdout()));
+    tee.push(Box::new(io::stdout()));
 
     for arg in args.iter().skip(1) {
         match File::create(&arg) {
