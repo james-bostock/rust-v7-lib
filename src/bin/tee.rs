@@ -50,10 +50,6 @@ fn main() {
 
     let prog = &args[0];
 
-    if args.len() == 1 {
-        eprintln!("usage: {} [name ...]", prog);
-    }
-
     let mut tee: Tee = Tee::new();
 
     tee.push(Box::new(io::stdout()));
