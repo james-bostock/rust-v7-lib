@@ -32,7 +32,7 @@ fn confirm(msg: &str) -> io::Result<bool> {
 /// Removes a file or directory
 fn rm(name: &str, force: bool, recursive: bool) -> io::Result<()> {
     let md = fs::metadata(name)?;
-    let go = if md.permissions().readonly() {
+    let go = if !force && md.permissions().readonly() {
         let mut msg = "rm: remove readonly file ".to_string();
         msg.push_str(&name);
         msg.push_str("?");
