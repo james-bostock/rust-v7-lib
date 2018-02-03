@@ -6,7 +6,6 @@
 use std::env;
 use std::io;
 
-#[macro_use]
 mod util;
 
 fn cat(filename: &str) -> io::Result<u64> {

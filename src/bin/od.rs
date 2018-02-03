@@ -14,7 +14,6 @@ use std::io::Stdout;
 use std::io::Write;
 use std::num::ParseIntError;
 
-#[macro_use]
 mod util;
 
 /// Writes a chunk of output data as octal byte values.

@@ -8,7 +8,6 @@ use std::fs;
 use std::io;
 use std::io::Write;
 
-#[macro_use]
 mod util;
 
 /// Prompts user for confirmation
