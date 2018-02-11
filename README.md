@@ -8,3 +8,4 @@ Commands implemented:
 * od
 * rm
 * tee
+* wc

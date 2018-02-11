@@ -1,0 +1,166 @@
+// Copyright 2018 James Bostock. See the LICENSE file at the top-level
+// directory of this distribution.
+
+// An implementation of the wc(1) command in Rust.
+// See http://man.cat-v.org/unix-6th/1/wc
+//
+// In reality, this is more of a V7 implementation given that the V6
+// wc(1) did not provide a character (i.e. byte) count and did not
+// support command line options.
+use std::env;
+use std::fmt;
+use std::io;
+use std::ops;
+use std::process;
+
+mod util;
+
+struct Format {
+    chars: bool, // Technically bytes.
+    words: bool,
+    lines: bool
+}
+
+impl Format {
+    fn new() -> Format {
+        // By default, all values are printed.
+        Format {chars: false, words: false, lines: false}
+    }
+}
+
+struct Counts<'a, 'b> {
+    chars: usize,
+    words: usize,
+    lines: usize,
+    file: &'a str,
+    in_word: bool,
+    format: &'b Format
+}
+
+impl<'a, 'b> Counts<'a, 'b> {
+    fn new(file: &'a str, format: &'b Format) -> Counts<'a, 'b> {
+        Counts {chars: 0, words: 0, lines: 0, file: file, in_word: false,
+                format: format}
+    }
+}
+
+impl<'a, 'b> ops::AddAssign for Counts<'a, 'b> {
+
+    fn add_assign(&mut self, rhs: Counts) {
+        *self = Counts {
+            chars: self.chars + rhs.chars,
+            words: self.words + rhs.words,
+            lines: self.lines + rhs.lines,
+            file: self.file,
+            in_word: self.in_word,
+            format: self.format
+        };
+    }
+}
+
+impl<'a, 'b> fmt::Display for Counts<'a, 'b> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        if self.format.lines {
+            let _ = write!(f, "{:7} ", self.lines);
+        }
+        if self.format.words {
+            let _ = write!(f, "{:7} ", self.words);
+        }
+        if self.format.chars {
+            let _ = write!(f, "{:7} ", self.chars);
+        }
+        write!(f, "{}", self.file)
+    }
+}
+
+impl<'a, 'b> io::Write for Counts<'a, 'b> {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        // ASCII codes of the characters that we consider whitespace.
+        const CR: u8 = 13; // Carriage return
+        const HT: u8 = 9;  // Horizontal tab
+        const LF: u8 = 10; // Line feed
+        const SP: u8 = 32; // Space
+        const VT: u8 = 11; // Vertical tab
+
+        for c in buf {
+            if *c == CR || *c == HT || *c == LF || *c == SP || *c == VT {
+                if self.in_word == true {
+                    self.in_word = false
+                }
+                if *c == LF {
+                    self.lines = self.lines + 1;
+                }
+            } else {
+                if self.in_word == false {
+                    self.in_word = true;
+                    self.words = self.words + 1;
+                }
+            }
+        }
+        self.chars = self.chars + buf.len();
+        Ok(buf.len())
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
+}
+
+fn wc<'a, 'b>(filename: &'a str, format: &'b Format) -> io::Result<Counts<'a, 'b>> {
+    let mut reader = util::Input::open(&filename)?;
+    let mut wc = Counts::new(&filename, format);
+    io::copy(&mut reader, &mut wc)?;
+    Ok(wc)
+}
+
+fn main () {
+    let mut args: Vec<_> = env::args().collect();
+
+    let prog = args.remove(0);
+
+    let mut format = Format::new();
+    let mut idx = 0;
+
+    while args.len() > idx && args[idx].starts_with('-') {
+        for opt in args[idx].chars().skip(1) {
+            match opt {
+                'c' => format.chars = true,
+                'l' => format.lines = true,
+                'w' => format.words = true,
+                _ => {
+                    eprintln!("{}: -{}: unrecognised option", prog, opt);
+                    process::exit(1);
+                }
+            }
+        }
+        idx = idx + 1;
+    }
+
+    if idx == 0 {
+        format.chars = true;
+        format.lines = true;
+        format.words = true;
+    }
+
+    let mut total = Counts::new("total", &format);
+
+    if args.len() == idx {
+        args.push("-".to_string());
+    }
+
+    for arg in args.iter().skip(idx) {
+        match wc(&arg, &format) {
+            Ok(wc) => {
+                println!("{}", wc);
+                total += wc;
+            }
+            Err(e) => {
+                eprintln!("{}: {}: {}", prog, arg, e);
+            }
+        };
+    }
+
+    if args.len() > 2 {
+        println!("{}", total);
+    }
+}
