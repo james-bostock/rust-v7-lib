@@ -39,8 +39,8 @@ struct Counts<'a, 'b> {
 
 impl<'a, 'b> Counts<'a, 'b> {
     fn new(file: &'a str, format: &'b Format) -> Counts<'a, 'b> {
-        Counts {chars: 0, words: 0, lines: 0, file: file, in_word: false,
-                format: format}
+        Counts {chars: 0, words: 0, lines: 0, file, in_word: false,
+                format}
     }
 }
 
@@ -84,20 +84,18 @@ impl<'a, 'b> io::Write for Counts<'a, 'b> {
 
         for c in buf {
             if *c == CR || *c == HT || *c == LF || *c == SP || *c == VT {
-                if self.in_word == true {
+                if self.in_word {
                     self.in_word = false
                 }
                 if *c == LF {
-                    self.lines = self.lines + 1;
+                    self.lines += 1;
                 }
-            } else {
-                if self.in_word == false {
-                    self.in_word = true;
-                    self.words = self.words + 1;
-                }
+            } else if !self.in_word {
+                self.in_word = true;
+                self.words += 1;
             }
         }
-        self.chars = self.chars + buf.len();
+        self.chars += buf.len();
         Ok(buf.len())
     }
 
@@ -133,7 +131,7 @@ fn main () {
                 }
             }
         }
-        idx = idx + 1;
+        idx += 1;
     }
 
     if idx == 0 {

@@ -35,11 +35,7 @@ fn rm(name: &str, force: bool, recursive: bool) -> io::Result<()> {
         let mut msg = "rm: remove readonly file ".to_string();
         msg.push_str(&name);
         msg.push_str("?");
-        if confirm(&msg)? {
-            true
-        } else {
-            false
-        }
+        confirm(&msg)?
     } else {
         true
     };

@@ -22,7 +22,7 @@ fn write_oct_bytes(out: &mut BufWriter<Stdout>, data: &[u8])
     for byte in data {
         write!(out, " {:03o}", byte)?;
     }
-    writeln!(out, "")?;
+    writeln!(out)?;
     Ok(data.len())
 }
 
@@ -31,9 +31,9 @@ fn write_oct_bytes(out: &mut BufWriter<Stdout>, data: &[u8])
 fn write_oct_words(out: &mut BufWriter<Stdout>, data: &[u8])
                    -> io::Result<usize> {
     for word in data.chunks(2) {
-        write!(out, "  {:06o}", (word[1] as u16) << 8 | (word[0] as u16))?;
+        write!(out, "  {:06o}", u16::from(word[1]) << 8 | u16::from(word[0]))?;
     }
-    writeln!(out, "")?;
+    writeln!(out)?;
     Ok(data.len())
 }
 
@@ -42,9 +42,9 @@ fn write_oct_words(out: &mut BufWriter<Stdout>, data: &[u8])
 fn write_dec_words(out: &mut BufWriter<Stdout>, data: &[u8])
                    -> io::Result<usize> {
     for word in data.chunks(2) {
-        write!(out, "  {:06}", (word[1] as u16) << 8 | (word[0] as u16))?;
+        write!(out, "  {:06}", u16::from(word[1]) << 8 | u16::from(word[0]))?;
     }
-    writeln!(out, "")?;
+    writeln!(out)?;
     Ok(data.len())
 }
 
@@ -53,9 +53,9 @@ fn write_dec_words(out: &mut BufWriter<Stdout>, data: &[u8])
 fn write_hex_words(out: &mut BufWriter<Stdout>, data: &[u8])
                    -> io::Result<usize> {
     for word in data.chunks(2) {
-        write!(out, "  {:06x}", (word[1] as u16) << 8 | (word[0] as u16))?;
+        write!(out, "  {:06x}", u16::from(word[1]) << 8 | u16::from(word[0]))?;
     }
-    writeln!(out, "")?;
+    writeln!(out)?;
     Ok(data.len())
 }
 
@@ -64,22 +64,22 @@ fn write_hex_words(out: &mut BufWriter<Stdout>, data: &[u8])
 fn write_ascii_chars(out: &mut BufWriter<Stdout>, data: &[u8])
                      -> io::Result<usize> {
     for byte in data {
-        match byte {
-            &7u8 => write!(out, " \\g")?,
-            &8u8 => write!(out, " \\b")?,
-            &9u8 => write!(out, " \\t")?,
-            &10u8 => write!(out, " \\n")?,
-            &11u8 => write!(out, " \\v")?,
-            &12u8 => write!(out, " \\f")?,
-            &13u8 => write!(out, " \\r")?,
-            _ => if byte < &32u8 || byte > &126u8 {
-                write!(out, " {:03o}", byte)?
+        match *byte {
+            7u8 => write!(out, " \\g")?,
+            8u8 => write!(out, " \\b")?,
+            9u8 => write!(out, " \\t")?,
+            10u8 => write!(out, " \\n")?,
+            11u8 => write!(out, " \\v")?,
+            12u8 => write!(out, " \\f")?,
+            13u8 => write!(out, " \\r")?,
+            _ => if *byte < 32u8 || *byte > 126u8 {
+                write!(out, " {:03o}", *byte)?
             } else {
                 write!(out, "   {}", *byte as char)?
             }
         }
     }
-    writeln!(out, "")?;
+    writeln!(out)?;
     Ok(data.len())
 }
 
@@ -138,7 +138,7 @@ fn test_parse_offset() {
 
 /// Dumps the data read from the named input source to the standard output.
 fn od(filename: &str, offset: u64,
-      fmts: &Vec<fn(&mut BufWriter<Stdout>,&[u8]) -> io::Result<usize>>)
+      fmts: &[fn(&mut BufWriter<Stdout>,&[u8]) -> io::Result<usize>])
       -> io::Result<u64> {
     let mut reader = BufReader::new(util::Input::open(filename)?);
     let mut writer = BufWriter::new(io::stdout());
@@ -161,7 +161,7 @@ fn od(filename: &str, offset: u64,
                     write!(writer, "       ")?;
                 }
                 fmt(&mut writer, &chunk)?;
-                offset = offset + chunk.len() as u64;
+                offset += chunk.len() as u64;
             }
         }
 
@@ -191,11 +191,11 @@ fn main() {
                 _ => println!("-{}: unrecognised option", opt),
             }
         }
-        idx = idx + 1;
+        idx += 1;
     }
 
     // If no output formats have been specified, default to octal words.
-    if fmts.len() == 0 {
+    if fmts.is_empty() {
         fmts.push(write_oct_words);
     }
 
@@ -205,7 +205,7 @@ fn main() {
             offstr = &args[idx][..];
         } else {
             filename = String::from(&args[idx][..]);
-            idx = idx + 1;
+            idx += 1;
         }
     }
 
