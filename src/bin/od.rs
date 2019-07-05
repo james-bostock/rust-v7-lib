@@ -117,22 +117,22 @@ fn parse_offset(offstr: &str) -> Result<u64, ParseIntError> {
 fn test_parse_offset() {
     match parse_offset("100") {
         Ok(off) => assert!(off == 0o100),
-        Err(e) => assert!(false)
+        Err(_) => assert!(false)
     }
 
     match parse_offset("100.") {
         Ok(off) => assert!(off == 100),
-        Err(e) => assert!(false)
+        Err(_) => assert!(false)
     }
 
     match parse_offset("100b") {
         Ok(off) => assert!(off == 0o100 * 512),
-        Err(e) => assert!(false)
+        Err(_) => assert!(false)
     }
 
     match parse_offset("100.b") {
         Ok(off) => assert!(off == 100 * 512),
-        Err(e) => assert!(false)
+        Err(_) => assert!(false)
     }
 }
 
