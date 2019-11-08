@@ -16,6 +16,8 @@ use std::num::ParseIntError;
 
 mod util;
 
+type FmtFn = fn(&mut BufWriter<Stdout>, &[u8]) -> io::Result<usize>;
+
 /// Writes a chunk of output data as octal byte values.
 fn write_oct_bytes(out: &mut BufWriter<Stdout>, data: &[u8])
                    -> io::Result<usize> {
@@ -138,7 +140,7 @@ fn test_parse_offset() {
 
 /// Dumps the data read from the named input source to the standard output.
 fn od(filename: &str, offset: u64,
-      fmts: &[fn(&mut BufWriter<Stdout>,&[u8]) -> io::Result<usize>])
+      fmt_fns: &[FmtFn])
       -> io::Result<u64> {
     let mut reader = BufReader::new(util::Input::open(filename)?);
     let mut writer = BufWriter::new(io::stdout());
@@ -153,14 +155,14 @@ fn od(filename: &str, offset: u64,
         let n = reader.read(&mut chunk)?;
         if n > 0 {
             let mut first = true;
-            for fmt in fmts.iter() {
+            for fmt_fn in fmt_fns.iter() {
                 if first {
                     write!(writer, "{:07o}", offset)?;
                     first = false;
                 } else {
                     write!(writer, "       ")?;
                 }
-                fmt(&mut writer, &chunk)?;
+                fmt_fn(&mut writer, &chunk)?;
                 offset += chunk.len() as u64;
             }
         }
@@ -178,16 +180,16 @@ fn main() {
     let mut idx = 0;
     let mut offset : u64 = 0;
     let mut offstr = "0";
-    let mut fmts: Vec<fn(&mut BufWriter<Stdout>, &[u8]) -> io::Result<usize>> = Vec::new();
+    let mut fmt_fns: Vec<FmtFn> = Vec::new();
 
     if args.len() > idx && args[idx].starts_with('-') {
         for opt in args[idx].chars().skip(1) {
             match opt {
-                'b' => fmts.push(write_oct_bytes),
-                'c' => fmts.push(write_ascii_chars),
-                'd' => fmts.push(write_dec_words),
-                'h' => fmts.push(write_hex_words),
-                'o' => fmts.push(write_oct_words),
+                'b' => fmt_fns.push(write_oct_bytes),
+                'c' => fmt_fns.push(write_ascii_chars),
+                'd' => fmt_fns.push(write_dec_words),
+                'h' => fmt_fns.push(write_hex_words),
+                'o' => fmt_fns.push(write_oct_words),
                 _ => println!("-{}: unrecognised option", opt),
             }
         }
@@ -195,8 +197,8 @@ fn main() {
     }
 
     // If no output formats have been specified, default to octal words.
-    if fmts.is_empty() {
-        fmts.push(write_oct_words);
+    if fmt_fns.is_empty() {
+        fmt_fns.push(write_oct_words);
     }
 
     let mut filename = String::from("-");
@@ -218,7 +220,7 @@ fn main() {
         Err(e) => println!("{}: {}", offstr, e)
     }
 
-    match od(&filename, offset, &fmts) {
+    match od(&filename, offset, &fmt_fns) {
         Ok(_) => std::process::exit(0),
         Err(e) => {
             eprintln!("Error: {}", e);
