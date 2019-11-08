@@ -1,5 +1,5 @@
-// Copyright 2017 James Bostock. See the LICENSE file at the top-level
-// directory of this distribution.
+// Copyright 2017, 2019 James Bostock. See the LICENSE file at the
+// top-level directory of this distribution.
 
 // An implementation of the tee(1) command in Rust.
 // See http://man.cat-v.org/unix-6th/1/tee
@@ -10,7 +10,7 @@ use std::io::{Result, Write};
 
 /// A multi-way writer.
 struct Tee {
-    writers: Vec<Box<Write>>
+    writers: Vec<Box<dyn Write>>
 }
 
 impl Tee {
@@ -20,7 +20,7 @@ impl Tee {
     }
 
     // Add a writer to a Tee
-    fn push(&mut self, w: Box<Write>) {
+    fn push(&mut self, w: Box<dyn Write>) {
         self.writers.push(w);
     }
 }
