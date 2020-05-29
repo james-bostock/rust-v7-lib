@@ -11,7 +11,6 @@ use std::env;
 use std::fmt;
 use std::io;
 use std::ops;
-use std::process;
 
 mod util;
 
@@ -112,29 +111,43 @@ fn wc<'a, 'b>(filename: &'a str, format: &'b Format) -> io::Result<Counts<'a, 'b
 }
 
 fn main () {
-    let mut args: Vec<_> = env::args().collect();
-
-    let prog = args.remove(0);
+    let mut args = env::args();
+    let prog = args.next().unwrap();
 
     let mut format = Format::new();
-    let mut idx = 0;
+    let getopt = util::GetOpt::new("clw", args);
 
-    while args.len() > idx && args[idx].starts_with('-') {
-        for opt in args[idx].chars().skip(1) {
-            match opt {
-                'c' => format.chars = true,
-                'l' => format.lines = true,
-                'w' => format.words = true,
-                _ => {
-                    eprintln!("{}: -{}: unrecognised option", prog, opt);
-                    process::exit(1);
-                }
-            }
+    let mut format_specified = false;
+    let mut files : Vec<String> = Vec::new();
+
+    for optarg in getopt {
+        match optarg {
+            Ok(util::Arg::Opt('c')) => {
+                format.chars = true;
+                format_specified = true;
+            },
+            Ok(util::Arg::Opt('l')) => {
+                format.lines = true;
+                format_specified = true;
+            },
+            Ok(util::Arg::Opt('w')) => {
+                format.words = true;
+                format_specified = true;
+            },
+            Ok(util::Arg::Arg(arg)) => files.push(arg),
+	    Ok(val) => {
+		// Should never happen.
+		eprintln!("{}: error: unexpected: {:?}", prog, val);
+		std::process::exit(1);
+	    },
+	    Err(e) => {
+		eprintln!("{}: error: {}", prog, e);
+		std::process::exit(1);
+	    }
         }
-        idx += 1;
     }
 
-    if idx == 0 {
+    if !format_specified {
         format.chars = true;
         format.lines = true;
         format.words = true;
@@ -142,11 +155,11 @@ fn main () {
 
     let mut total = Counts::new("total", &format);
 
-    if args.len() == idx {
-        args.push("-".to_string());
+    if files.len() == 0 {
+        files.push("-".to_string());
     }
 
-    for arg in args.iter().skip(idx) {
+    for arg in &files {
         match wc(&arg, &format) {
             Ok(wc) => {
                 println!("{}", wc);
@@ -158,7 +171,7 @@ fn main () {
         };
     }
 
-    if args.len() > 2 {
+    if files.len() > 1 {
         println!("{}", total);
     }
 }

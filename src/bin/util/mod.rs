@@ -4,6 +4,9 @@
 use std::fs;
 use std::io::{self, Read, Seek, SeekFrom};
 
+mod getopt;
+pub use getopt::*;
+
 // Utility routines
 
 // An input source.

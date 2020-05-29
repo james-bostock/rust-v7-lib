@@ -52,33 +52,40 @@ fn rm(name: &str, force: bool, recursive: bool) -> io::Result<()> {
 }
 
 fn main() {
-    let args: Vec<_> = env::args().collect();
-    let mut processing_options: bool = true;
+    let mut args = env::args();
+    let prog = args.next().unwrap();
     let mut force: bool = false;
     let mut recursive: bool = false;
+    let mut print_usage = true;
+    let getopt = util::GetOpt::new("rf", args);
 
-    if args.len() > 1 {
-        for arg in args.iter().skip(1) {
-            if arg == "-f" {
-                if processing_options {
-                    force = true;
-                    continue;
+    for optarg in getopt {
+        match optarg {
+            Ok(util::Arg::Opt('f')) => force = true,
+            Ok(util::Arg::Opt('r')) => recursive = true,
+            Ok(util::Arg::Arg(arg)) => {
+                match rm(&arg, force, recursive) {
+                    Ok(_) => print_usage = false,
+                    Err(e) => {
+                        eprintln!("{}: {}", arg, e);
+                        std::process::exit(1);
+                    }
                 }
-            } else if arg == "-r" {
-                if processing_options {
-                    recursive = true;
-                    continue;
-                }
-            } else {
-                processing_options = false;
             }
-
-            match rm(arg, force, recursive) {
-                Ok(_) => {},
-                Err(e) => eprintln!("{}: {}", arg, e)
+            Ok(val) => {
+                eprintln!("{}: error: unexpected: {:?}", prog, val);
+                std::process::exit(1);
+            },
+            Err(e) => {
+                eprintln!("{}: error: {}", prog, e);
+                std::process::exit(1);
             }
         }
-    } else {
-        eprintln!("usage: {} [-f][-r] file ...", args[0]);
     }
+
+    if print_usage {
+        eprintln!("usage: {} [-f][-r] file ...", prog);
+        std::process::exit(1);
+    }
+    std::process::exit(0);
 }

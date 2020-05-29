@@ -176,43 +176,45 @@ fn od(filename: &str, offset: u64,
 }
 
 fn main() {
-    let args: Vec<_> = env::args().skip(1).collect();
-    let mut idx = 0;
+    let mut args = env::args();
+    let prog = args.next().unwrap();
     let mut offset : u64 = 0;
-    let mut offstr = "0";
+    let mut offstr = String::from("0");
     let mut fmt_fns: Vec<FmtFn> = Vec::new();
+    let getopt = util::GetOpt::new("bcdho", args);
 
-    if args.len() > idx && args[idx].starts_with('-') {
-        for opt in args[idx].chars().skip(1) {
-            match opt {
-                'b' => fmt_fns.push(write_oct_bytes),
-                'c' => fmt_fns.push(write_ascii_chars),
-                'd' => fmt_fns.push(write_dec_words),
-                'h' => fmt_fns.push(write_hex_words),
-                'o' => fmt_fns.push(write_oct_words),
-                _ => println!("-{}: unrecognised option", opt),
-            }
-        }
-        idx += 1;
+    // Default to reading from standard input.
+    let mut filename = String::from("-");
+
+    for arg in getopt {
+	match arg {
+	    Ok(util::Arg::Opt('b')) => fmt_fns.push(write_oct_bytes),
+	    Ok(util::Arg::Opt('c')) => fmt_fns.push(write_ascii_chars),
+	    Ok(util::Arg::Opt('d')) => fmt_fns.push(write_dec_words),
+	    Ok(util::Arg::Opt('h')) => fmt_fns.push(write_hex_words),
+	    Ok(util::Arg::Opt('o')) => fmt_fns.push(write_oct_words),
+	    Ok(util::Arg::Arg(val)) => {
+		if val.starts_with('+') {
+		    offstr = val;
+		} else {
+		    filename = val;
+		}
+	    },
+	    Ok(val) => {
+		// Should never happen.
+		eprintln!("{}: error: unexpected: {:?}", prog, val);
+		std::process::exit(1);
+	    },
+	    Err(e) => {
+		eprintln!("{}: error: {}", prog, e);
+		std::process::exit(1);
+	    }
+	}
     }
 
     // If no output formats have been specified, default to octal words.
     if fmt_fns.is_empty() {
         fmt_fns.push(write_oct_words);
-    }
-
-    let mut filename = String::from("-");
-    if args.len() > idx {
-        if args[idx].starts_with('+') {
-            offstr = &args[idx][..];
-        } else {
-            filename = String::from(&args[idx][..]);
-            idx += 1;
-        }
-    }
-
-    if args.len() > idx {
-        offstr = &args[idx][..];
     }
 
     match parse_offset(&offstr) {
