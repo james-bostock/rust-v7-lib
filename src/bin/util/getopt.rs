@@ -36,7 +36,7 @@ impl OptSpec {
     /// let opt_spec = OptSpec::new('a', false);
     /// ```
     fn new(opt: char, has_arg: bool) -> Self {
-	OptSpec {opt: opt, has_arg: has_arg}
+	OptSpec {opt, has_arg}
     }
 }
 
@@ -72,19 +72,17 @@ fn parse_optstring(optstring: &str) -> Vec<OptSpec> {
 		}
 	    }
 	} else if char.is_ascii_alphanumeric() {
-	    match last {
-		Some(c) => opt_specs.push(OptSpec::new(c, false)),
-		None => {}
-	    };
+	    if let Some(c) = last {
+		opt_specs.push(OptSpec::new(c, false))
+	    }
 	    last = Some(char);
 	} else {
 	    panic!("{}: invalid option specification", optstring);
 	}
     }
 
-    match last {
-	Some(c) => opt_specs.push(OptSpec::new(c, false)),
-	None => {}
+    if let Some(c) = last {
+	opt_specs.push(OptSpec::new(c, false))
     }
 
     opt_specs
@@ -111,9 +109,9 @@ where
     pub fn new(optstring: &str, args: I) -> Self {
 	let opt_specs = parse_optstring(&optstring);
 	GetOpt {
-	    opt_specs: opt_specs,
+	    opt_specs,
 	    opts_done: false,
-	    args: args,
+	    args,
 	    chars: Vec::new(),
 	    idx: 0
 	}
@@ -134,35 +132,33 @@ where
     fn handle_arg(&mut self, arg: &str) -> Option<Result<Arg, GetOptErr>> {
 	if self.opts_done {
 	    Some(Ok(Arg::Arg(arg.to_string())))
-	} else {
-	    if arg.starts_with("-") {
-		self.chars = arg.chars().collect();
-		self.idx = 1;
-		if self.chars.len() > 1 {
-		    if self.chars.len() == 2 && self.chars[1] == '-' {
-			self.opts_done = true;
-			self.idx = 0;
-			match self.args.next() {
-			    Some(arg) => self.handle_arg(&arg),
-			    None => None
-			}
-		    } else {
-			self.handle_option()
+	} else if arg.starts_with('-') {
+	    self.chars = arg.chars().collect();
+	    self.idx = 1;
+	    if self.chars.len() > 1 {
+		if self.chars.len() == 2 && self.chars[1] == '-' {
+		    self.opts_done = true;
+		    self.idx = 0;
+		    match self.args.next() {
+			Some(arg) => self.handle_arg(&arg),
+			None => None
 		    }
 		} else {
-		    Some(Err(GetOptErr::MissingOpt))
+		    self.handle_option()
 		}
 	    } else {
-		self.opts_done = true;
-		Some(Ok(Arg::Arg(arg.to_string())))
+		Some(Err(GetOptErr::MissingOpt))
 	    }
+	} else {
+	    self.opts_done = true;
+	    Some(Ok(Arg::Arg(arg.to_string())))
 	}
     }
 
     /// Handle a command line option.
     fn handle_option(&mut self) -> Option<Result<Arg, GetOptErr>> {
 	let opt = self.chars[self.idx];
-	self.idx = self.idx + 1;
+	self.idx += 1;
 	match self.find_opt_spec(opt) {
 	    Some(opt_spec) => {
 		if opt_spec.has_arg {
@@ -211,7 +207,7 @@ where
     /// Advances the getopt iterator and returns the next command line
     /// argument.
     fn next(&mut self) -> Option<Self::Item> {
-	if self.chars.len() > 0 && self.idx > 0 && self.idx < self.chars.len() {
+	if !self.chars.is_empty() && self.idx > 0 && self.idx < self.chars.len() {
 	    self.handle_option()
 	} else {
 	    match self.args.next() {

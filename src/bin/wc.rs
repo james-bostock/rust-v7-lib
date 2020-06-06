@@ -155,7 +155,7 @@ fn main () {
 
     let mut total = Counts::new("total", &format);
 
-    if files.len() == 0 {
+    if files.is_empty() {
         files.push("-".to_string());
     }
 
