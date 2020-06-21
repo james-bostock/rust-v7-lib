@@ -29,12 +29,6 @@ struct OptSpec {
 
 impl OptSpec {
     /// Creates a new `OptSpec`.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// let opt_spec = OptSpec::new('a', false);
-    /// ```
     fn new(opt: char, has_arg: bool) -> Self {
 	OptSpec {opt, has_arg}
     }
@@ -97,13 +91,13 @@ where
     /// # Example
     ///
     /// ```
-    /// use env;
-    /// mod util;
-    /// let args = env::args();
+    /// use std::env;
+    /// use rust_v7_lib as lib;
+    /// let mut args = env::args();
     /// let prog = args.next();
-    /// let getopt = util::GetOpt::new("-ab:", args).unwrap();
+    /// let getopt = lib::GetOpt::new("ab:", args);
     /// for optarg in getopt {
-    ///     ...
+    ///     // Process optarg
     /// }
     /// ```
     pub fn new(optstring: &str, args: I) -> Self {

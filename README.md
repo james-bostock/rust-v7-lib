@@ -1,11 +1,5 @@
-# rust-v6-cmd
-Some Sixth Edition Unix commands implemented in Rust.
+# rust-v7-lib
 
-Commands implemented:
-
-* cat
-* echo
-* od
-* rm
-* tee
-* wc
+Support library for my
+[rust-v7-cmd](https://github.com/james-bostock/rust-v7-cmd)
+repository.

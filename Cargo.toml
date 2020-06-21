@@ -1,9 +1,9 @@
 [package]
-name = "rust-v6-cmd"
+name = "rust-v7-lib"
 version = "0.1.0"
 authors = ["James Bostock <james.bostock@gmail.com>"]
-description = "Some Sixth Edition Unix commands implemented in Rust"
-repository = "https://github.com/james-bostock/rust-v6-cmd"
+description = "Support library for the rust-v7-cmd crate."
+repository = "https://github.com/james-bostock/rust-v7-lib"
 readme = "README.md"
 license = "MIT"
 edition = "2018"
