@@ -138,7 +138,7 @@ where
 			None => None
 		    }
 		} else {
-		    self.handle_option()
+		    Some(self.handle_option())
 		}
 	    } else {
 		Some(Err(GetOptErr::MissingOpt))
@@ -150,21 +150,21 @@ where
     }
 
     /// Handle a command line option.
-    fn handle_option(&mut self) -> Option<Result<Arg, GetOptErr>> {
+    fn handle_option(&mut self) -> Result<Arg, GetOptErr> {
 	let opt = self.chars[self.idx];
 	self.idx += 1;
 	match self.find_opt_spec(opt) {
 	    Some(opt_spec) => {
 		if opt_spec.has_arg {
 		    match self.args.next() {
-			Some(arg) => Some(Ok(Arg::OptWithArg(opt, arg))),
-			None => Some(Err(GetOptErr::MissingArg(opt)))
+			Some(arg) => Ok(Arg::OptWithArg(opt, arg)),
+			None => Err(GetOptErr::MissingArg(opt))
 		    }
 		} else {
-		    Some(Ok(Arg::Opt(opt)))
+		    Ok(Arg::Opt(opt))
 		}
 	    },
-	    None => Some(Err(GetOptErr::UnknownOpt(opt)))
+	    None => Err(GetOptErr::UnknownOpt(opt))
 	}
     }
 }
@@ -202,7 +202,7 @@ where
     /// argument.
     fn next(&mut self) -> Option<Self::Item> {
 	if !self.chars.is_empty() && self.idx > 0 && self.idx < self.chars.len() {
-	    self.handle_option()
+	    Some(self.handle_option())
 	} else {
 	    match self.args.next() {
 		Some(arg) => {
