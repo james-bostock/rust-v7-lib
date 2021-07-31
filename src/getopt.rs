@@ -101,7 +101,7 @@ where
     /// }
     /// ```
     pub fn new(optstring: &str, args: I) -> Self {
-	let opt_specs = parse_optstring(&optstring);
+	let opt_specs = parse_optstring(optstring);
 	GetOpt {
 	    opt_specs,
 	    opts_done: false,
