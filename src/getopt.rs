@@ -1,4 +1,4 @@
-// Copyright 2020, 2021 James Bostock. See the LICENSE file at the top-level
+// Copyright 2020, 2021, 2023 James Bostock. See the LICENSE file at the top-level
 // directory of this distribution.
 
 //! A command line parser similar to getopt(3).
