@@ -45,10 +45,7 @@ impl Seek for Input {
         match *self {
             Input::File(ref mut file) => file.seek(pos),
             Input::Stdin(_) => {
-                Err(io::Error::new(
-                    io::ErrorKind::Other,
-                    "not supported by stdin-input",
-                ))
+                Err(io::Error::other("not supported by stdin-input"))
             },
         }
     }
