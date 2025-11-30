@@ -1,4 +1,4 @@
-// Copyright 2015-2017 James Bostock. See the LICENSE file at the top-level
+// Copyright 2015-2025 James Bostock. See the LICENSE file at the top-level
 // directory of this distribution.
 
 use std::fs;
@@ -45,10 +45,7 @@ impl Seek for Input {
         match *self {
             Input::File(ref mut file) => file.seek(pos),
             Input::Stdin(_) => {
-                Err(io::Error::new(
-                    io::ErrorKind::Other,
-                    "not supported by stdin-input",
-                ))
+                Err(io::Error::other("not supported by stdin-input"))
             },
         }
     }

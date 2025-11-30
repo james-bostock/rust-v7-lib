@@ -1,4 +1,4 @@
-// Copyright 2020, 2021 James Bostock. See the LICENSE file at the top-level
+// Copyright 2020, 2021, 2023 James Bostock. See the LICENSE file at the top-level
 // directory of this distribution.
 
 //! A command line parser similar to getopt(3).
@@ -62,7 +62,7 @@ fn parse_optstring(optstring: &str) -> Vec<OptSpec> {
 	    match last {
 		Some(c) => opt_specs.push(OptSpec::new(c, true)),
 		None => {
-		    panic!("{}: invalid option specification", optstring);
+		    panic!("{optstring}: invalid option specification");
 		}
 	    }
 	} else if char.is_ascii_alphanumeric() {
@@ -71,7 +71,7 @@ fn parse_optstring(optstring: &str) -> Vec<OptSpec> {
 	    }
 	    last = Some(char);
 	} else {
-	    panic!("{}: invalid option specification", optstring);
+	    panic!("{optstring}: invalid option specification");
 	}
     }
 
@@ -185,9 +185,9 @@ pub enum GetOptErr {
 impl fmt::Display for GetOptErr {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 	match self {
-	    GetOptErr::MissingArg(c) => write!(f, "-{}: expected an argument", c),
+	    GetOptErr::MissingArg(c) => write!(f, "-{c}: expected an argument"),
 	    GetOptErr::MissingOpt => write!(f, "Missing option letter"),
-	    GetOptErr::UnknownOpt(c) => write!(f, "-{}: unknown option", c)
+	    GetOptErr::UnknownOpt(c) => write!(f, "-{c}: unknown option")
 	}
     }
 }
